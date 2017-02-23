@@ -45,13 +45,15 @@ func (subdomains SubdomainsMux) ServeHTTP(w http.ResponseWriter, r *http.Request
 func main() {
     fmt.Printf("Main function for extender\n")
 
-    ndb := netdb.MemDB{}
-    ndb.InitDB("memdb")
+    netdb.SchedDB = &netdb.MemDB{}
+    netdb.SchedDB.InitDB("memdb")
+    
+    //fmt.Printf("main scheddb=%p\n", netdb.SchedDB)
 
     subdomains := make(SubdomainsMux)
-    subdomains[handler.SchedulerDom] = handler.GetKubeSchedulerMuxHdl(ndb) 
+    subdomains[handler.SchedulerDom] = handler.GetKubeSchedulerMuxHdl() 
     fmt.Printf("Register mux for %s\n", handler.SchedulerDom)
-    subdomains[handler.HekaDom] = handler.GetHekaInMuxHdl(ndb) 
+    subdomains[handler.HekaDom] = handler.GetHekaInMuxHdl() 
     fmt.Printf("Register mux for %s\n", handler.HekaDom)
 
     err := http.ListenAndServe(":50000", subdomains)

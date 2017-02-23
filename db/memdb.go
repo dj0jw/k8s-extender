@@ -12,18 +12,20 @@ const (
     unknownVal          = "Unknown"
 )
 
+var SchedDB *MemDB
+
 type MemDB struct {
-    name    string
+    Name    string
     mutex   sync.Mutex        
     db      map[string][]byte
 }
 
-func (ndb *MemDB) read (key string) ([]byte, error) {
+func (mdb *MemDB) read (key string) ([]byte, error) {
     var val []byte 
 
-    ndb.mutex.Lock()
-    val, ok := ndb.db[key]
-    ndb.mutex.Unlock()
+    mdb.mutex.Lock()
+    val, ok := mdb.db[key]
+    mdb.mutex.Unlock()
 
     if ok {
         return val, nil
@@ -32,18 +34,19 @@ func (ndb *MemDB) read (key string) ([]byte, error) {
     }
 }
 
-func (ndb *MemDB) write (key string, val []byte) (error) {
-    ndb.mutex.Lock()
-    ndb.db[key] = val
-    ndb.mutex.Unlock()
+func (mdb *MemDB) write (key string, val []byte) (error) {
+    //fmt.Printf("write memdb=%p db=%p\n", mdb, mdb.db)
+    mdb.mutex.Lock()
+    mdb.db[key] = val
+    mdb.mutex.Unlock()
     
     return nil
 }
 
-func (ndb MemDB) GetMmode () bool {
+func (mdb *MemDB) GetMmode () bool {
     var mmode bool
 
-    val, err := ndb.read(mmodeKey)
+    val, err := mdb.read(mmodeKey)
     if err != nil {
         mmode = false
     } else {
@@ -57,7 +60,7 @@ func (ndb MemDB) GetMmode () bool {
     return mmode
 }
 
-func (ndb MemDB) SetMmode (mmode string) {
+func (mdb *MemDB) SetMmode (mmode string) {
     var val []byte
 
     if mmode == mmodeNormal || mmode == mmodeMaintenance {
@@ -66,12 +69,14 @@ func (ndb MemDB) SetMmode (mmode string) {
         val = []byte(unknownVal)
     } 
 
-    ndb.write(mmodeKey, val)
+    //fmt.Printf("memdb set memdb=%p db=%p\n", mdb, mdb.db)
+    mdb.write(mmodeKey, val)
 }
 
-func (ndb MemDB) InitDB (name string) error {
-    ndb.name = name
-    ndb.db = make(map[string][]byte)
+func (mdb *MemDB) InitDB (name string) error {
+    mdb.Name = name
+    mdb.db = make(map[string][]byte, 10)
+    //fmt.Printf("init mdb=%p db=%p\n", mdb, mdb.db)
 
     return nil
 }

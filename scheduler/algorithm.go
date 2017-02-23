@@ -2,7 +2,7 @@ package algorithm
 
 import (
     "fmt"
-    //"github.com/nxoscoder/k8s-extender/db"
+    "github.com/nxoscoder/k8s-extender/db"
     "k8s.io/kubernetes/pkg/api/v1"
     schedulerapi "k8s.io/kubernetes/plugin/pkg/scheduler/api/v1"
 )
@@ -23,9 +23,9 @@ type Extender struct {
 
 func GetExtender () (*Extender) {
    return &Extender{
-        name:         "netextender",
-        predicates:   []FitPredicate{NetworkPredicate},
-        prioritizers: []PriorityConfig{{NetworkPrioritizer, 1}},
+        name:           "netextender",
+        predicates:     []FitPredicate{NetworkPredicate},
+        prioritizers:   []PriorityConfig{{NetworkPrioritizer, 1}},
     }
 }
 
@@ -111,7 +111,7 @@ func NetworkPrioritizer (pod *v1.Pod, nodes *v1.NodeList, e *Extender) (*schedul
         // the network-element is busted, we are increasing the score to get to the master. 
         network_elem := false   // true when in maintenance mode
         fmt.Printf("node=%s\n", node.Name)
-        //fmt.Printf("mmode=%t\n", e.db.getMmode())
+        fmt.Printf("mmode=%t\n", netdb.SchedDB.GetMmode())
         if node.Name == "n9kinfra-mr-master01" && network_elem {
             score = 10
         }

@@ -11,7 +11,6 @@ import (
 
 type HekaIn struct {
     name    string
-    db      netdb.NetDB
 }
 
 func (hi *HekaIn) mmodeHdl (rw http.ResponseWriter, req *http.Request) {
@@ -33,15 +32,16 @@ func (hi *HekaIn) mmodeHdl (rw http.ResponseWriter, req *http.Request) {
     if output, ok := data["output"]; ok {
         if mmode, ok := output.(map[string]interface{})["system_mode"]; ok {
             fmt.Printf("mmode=%s\n", mmode)
-            hi.db.SetMmode(mmode.(string))
+            //fmt.Printf("heka scheddb=%p\n", netdb.SchedDB)
+            netdb.SchedDB.SetMmode(mmode.(string))
         }
     }
 
     return
 }
 
-func GetHekaInMuxHdl (ndb netdb.NetDB) (http.Handler) {
-    hekain := &HekaIn{name: "hekaIn", db: ndb}
+func GetHekaInMuxHdl () (http.Handler) {
+    hekain := &HekaIn{name: "hekain"}
 
     mux := http.NewServeMux()
     mux.HandleFunc(MmodeUrl, hekain.mmodeHdl)

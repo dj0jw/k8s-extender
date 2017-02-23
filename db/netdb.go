@@ -1,9 +1,10 @@
 package netdb
 
 const (
-    MEMORY  = iota
-    FILE    = iota
-    ELASTIC = iota
+    _       = iota
+    MEMORY
+    FILE
+    ELASTIC
 )
 
 type NetDB interface {
@@ -11,4 +12,3 @@ type NetDB interface {
     GetMmode () bool
     SetMmode (string)
 }
-

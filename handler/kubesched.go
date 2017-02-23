@@ -6,7 +6,6 @@ import (
     "log"
     "net/http"
     "github.com/nxoscoder/k8s-extender/utils"
-    "github.com/nxoscoder/k8s-extender/db"
     "github.com/nxoscoder/k8s-extender/scheduler"
     schedulerapi "k8s.io/kubernetes/plugin/pkg/scheduler/api/v1"
 )
@@ -14,7 +13,6 @@ import (
 type NetSched struct {
     name        string
     extender    *algorithm.Extender
-    db          netdb.NetDB
 }
 
 func getSchedulerArgs (rw http.ResponseWriter, req *http.Request) (schedulerapi.ExtenderArgs, error) {
@@ -81,13 +79,12 @@ func (ns *NetSched) networkSchedulerPrioritizeHdl (rw http.ResponseWriter, req *
     return
 }
 
-func GetKubeSchedulerMuxHdl (ndb netdb.NetDB) (http.Handler) {
+func GetKubeSchedulerMuxHdl () (http.Handler) {
     netextender := algorithm.GetExtender()
 
     netsched := &NetSched {
         name:       "netsched",
         extender:   netextender,
-        db:         ndb,
     }
 
     mux := http.NewServeMux()
