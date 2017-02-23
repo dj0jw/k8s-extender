@@ -46,7 +46,8 @@ func main() {
     fmt.Printf("Main function for extender\n")
 
     netdb.SchedDB = &netdb.MemDB{}
-    netdb.SchedDB.InitDB("memdb")
+    //netdb.SchedDB = &netdb.FileDB{}
+    netdb.SchedDB.OpenDB("scheddb")
     
     //fmt.Printf("main scheddb=%p\n", netdb.SchedDB)
 
@@ -60,4 +61,6 @@ func main() {
     if err != nil {
         fmt.Printf("Failed to listen and serve\n")
     }
+
+    netdb.SchedDB.CloseDB()
 }

@@ -5,15 +5,6 @@ import (
     "errors"
 )
 
-const (
-    mmodeKey            = "mmode"
-    mmodeNormal         = "Normal"
-    mmodeMaintenance    = "Maintenance"
-    unknownVal          = "Unknown"
-)
-
-var SchedDB *MemDB
-
 type MemDB struct {
     Name    string
     mutex   sync.Mutex        
@@ -43,40 +34,28 @@ func (mdb *MemDB) write (key string, val []byte) (error) {
     return nil
 }
 
-func (mdb *MemDB) GetMmode () bool {
-    var mmode bool
-
+func (mdb *MemDB) GetMmode () (bool) {
     val, err := mdb.read(mmodeKey)
     if err != nil {
-        mmode = false
+        return false
     } else {
-        if string(val) == mmodeMaintenance {
-            mmode = true
-        } else {
-            mmode = false  
-        }
+        return getMmodeBool(val)
     }
-
-    return mmode
 }
 
 func (mdb *MemDB) SetMmode (mmode string) {
-    var val []byte
-
-    if mmode == mmodeNormal || mmode == mmodeMaintenance {
-        val = []byte(mmode)
-    } else {
-        val = []byte(unknownVal)
-    } 
-
     //fmt.Printf("memdb set memdb=%p db=%p\n", mdb, mdb.db)
-    mdb.write(mmodeKey, val)
+    mdb.write(mmodeKey, getMmodeVal(mmode))
 }
 
-func (mdb *MemDB) InitDB (name string) error {
+func (mdb *MemDB) OpenDB (name string) error {
     mdb.Name = name
     mdb.db = make(map[string][]byte, 10)
     //fmt.Printf("init mdb=%p db=%p\n", mdb, mdb.db)
 
+    return nil
+}
+
+func (mdb *MemDB) CloseDB() (error) {
     return nil
 }
